@@ -102,13 +102,13 @@ async def test_chat_service_prompt_templates_used() -> None:
     provider = MockLLMProvider()
     service = ChatService(provider=provider)
 
-    request = SummarizeRequest(text="Some text to summarize")
-    response = await service.summarize(request)
-    assert len(response.summary) > 0
+    summarize_request = SummarizeRequest(text="Some text to summarize")
+    summarize_response = await service.summarize(summarize_request)
+    assert len(summarize_response.summary) > 0
 
-    request = ClassifyRequest(
+    classify_request = ClassifyRequest(
         text="Some text",
         categories=["a", "b", "c"],
     )
-    response = await service.classify(request)
-    assert response.category in ["a", "b", "c"]
+    classify_response = await service.classify(classify_request)
+    assert classify_response.category in ["a", "b", "c"]

@@ -1,3 +1,5 @@
+from collections.abc import AsyncGenerator
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
@@ -16,7 +18,7 @@ def chat_service(mock_provider: MockLLMProvider) -> ChatService:
 
 
 @pytest.fixture
-async def client() -> AsyncClient:
+async def client() -> AsyncGenerator[AsyncClient, None]:
     from app.main import app
 
     transport = ASGITransport(app=app)

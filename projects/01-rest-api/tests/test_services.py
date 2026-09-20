@@ -9,7 +9,7 @@ from app.schemas.item import ItemCreate, ItemUpdate
 from app.services.item import ItemService
 
 
-def _build_service() -> ItemService:
+def _build_service() -> tuple[ItemService, AsyncMock]:
     """Return an ItemService backed by an AsyncMock repository."""
     mock_repo = AsyncMock()
     return ItemService(mock_repo), mock_repo

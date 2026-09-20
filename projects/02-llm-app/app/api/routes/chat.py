@@ -1,4 +1,8 @@
+from collections.abc import AsyncIterator
+from typing import Any
+
 from fastapi import APIRouter
+from fastapi.responses import StreamingResponse
 
 from app.llm.factory import get_llm_provider
 from app.schemas.llm import (
@@ -20,15 +24,13 @@ def _get_chat_service() -> ChatService:
 
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest) -> ChatResponse:
+async def chat(request: ChatRequest) -> Any:
     """Send a chat message and receive a completion."""
     service = _get_chat_service()
     if request.stream:
         import json
 
-        from fastapi.responses import StreamingResponse
-
-        async def event_stream():
+        async def event_stream() -> AsyncIterator[str]:
             async for chunk in service.chat_stream(request):
                 yield f"data: {json.dumps({'content': chunk})}\n\n"
             yield "data: [DONE]\n\n"

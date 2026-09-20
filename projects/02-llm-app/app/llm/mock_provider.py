@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator
 from app.llm.base import LLMProvider
 from app.schemas.llm import ChatMessage, ChatResponse, ModelInfo, TokenUsage
 
-MOCK_RESPONSES: dict[str, list[str]] = {
+MOCK_RESPONSES: dict[str, list[str] | dict[str, list[str]]] = {
     "default": [
         "I understand your question. Here's a detailed response based on my analysis of the provided context. The key points are: first, the information suggests a strong correlation between the variables mentioned. Second, there are several factors to consider when interpreting these results. Would you like me to elaborate on any specific aspect?",
         "Based on my analysis, here are the key findings: The data indicates a clear trend that supports the hypothesis. However, there are some edge cases worth noting. I'd recommend considering these additional factors before drawing final conclusions.",
@@ -99,10 +99,17 @@ class MockLLMProvider(LLMProvider):
 
     def _select_response(self, prompt: str) -> str:
         if "summariz" in prompt or "summary" in prompt:
-            return random.choice(MOCK_RESPONSES["summarize"])
+            responses = MOCK_RESPONSES["summarize"]
+            assert isinstance(responses, list)
+            return random.choice(responses)
 
         if "classif" in prompt or "categor" in prompt:
             category = random.choice(["positive", "negative", "neutral"])
-            return random.choice(MOCK_RESPONSES["classify"][category])
+            classify_responses = MOCK_RESPONSES["classify"]
+            if isinstance(classify_responses, dict):
+                return random.choice(classify_responses[category])
+            return random.choice(classify_responses)
 
-        return random.choice(MOCK_RESPONSES["default"])
+        default_responses = MOCK_RESPONSES["default"]
+        assert isinstance(default_responses, list)
+        return random.choice(default_responses)

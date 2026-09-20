@@ -27,9 +27,9 @@ class LLMProvider(ABC):
         temperature: float | None = None,
     ) -> AsyncIterator[str]:
         """Generate a streamed response from the LLM."""
-        ...
-        yield  # make this a generator
-        return  # pragma: no cover
+        ...  # pragma: no cover
+        if False:  # pragma: no cover
+            yield ""  # make this an async generator
 
     @abstractmethod
     async def get_model_info(self, model: str | None = None) -> ModelInfo:

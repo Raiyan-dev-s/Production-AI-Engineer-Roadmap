@@ -21,7 +21,7 @@ class BaseRepository[ModelType]:
     async def get(self, id: Any) -> ModelType | None:
         """Fetch a single record by primary key."""
         result = await self.session.execute(
-            select(self.model).where(self.model.id == id)
+            select(self.model).where(self.model.id == id)  # type: ignore[attr-defined]
         )
         return result.scalar_one_or_none()
 
@@ -37,7 +37,7 @@ class BaseRepository[ModelType]:
         result = await self.session.execute(
             select(func.count()).select_from(self.model)
         )
-        return result.scalar_one()  # type: ignore[no-any-return]
+        return result.scalar_one()
 
     async def create(self, obj_in: dict[str, Any]) -> ModelType:
         """Create a new record from a dictionary of values."""

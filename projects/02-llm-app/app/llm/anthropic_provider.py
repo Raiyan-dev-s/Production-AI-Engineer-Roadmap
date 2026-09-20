@@ -1,4 +1,5 @@
 from collections.abc import AsyncIterator
+from typing import Any
 
 from app.core.config import settings
 from app.core.exceptions import ProviderNotConfiguredError, ProviderNotInstalledError
@@ -67,7 +68,7 @@ class AnthropicProvider(LLMProvider):
             else:
                 chat_messages.append({"role": m.role, "content": m.content})
 
-        kwargs: dict = {
+        kwargs: dict[str, Any] = {
             "model": target_model,
             "messages": chat_messages,
             "max_tokens": max_tok,
@@ -112,7 +113,7 @@ class AnthropicProvider(LLMProvider):
             else:
                 chat_messages.append({"role": m.role, "content": m.content})
 
-        kwargs: dict = {
+        kwargs: dict[str, Any] = {
             "model": target_model,
             "messages": chat_messages,
             "max_tokens": max_tok,

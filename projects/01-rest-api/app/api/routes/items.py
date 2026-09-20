@@ -1,5 +1,7 @@
 """Item CRUD routes."""
 
+from typing import Any
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -22,7 +24,7 @@ async def list_items(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     service: ItemService = Depends(_get_service),
-) -> dict:
+) -> Any:
     """Return a paginated list of all items."""
     return await service.get_items(skip=skip, limit=limit)
 
@@ -31,7 +33,7 @@ async def list_items(
 async def get_item(
     item_id: str,
     service: ItemService = Depends(_get_service),
-) -> dict:
+) -> Any:
     """Return a single item by its ID."""
     return await service.get_item(item_id)
 
@@ -40,7 +42,7 @@ async def get_item(
 async def create_item(
     item_in: ItemCreate,
     service: ItemService = Depends(_get_service),
-) -> dict:
+) -> Any:
     """Create a new item and return it."""
     return await service.create_item(item_in)
 
@@ -50,7 +52,7 @@ async def update_item(
     item_id: str,
     item_in: ItemUpdate,
     service: ItemService = Depends(_get_service),
-) -> dict:
+) -> Any:
     """Update an existing item and return the result."""
     return await service.update_item(item_id, item_in)
 
