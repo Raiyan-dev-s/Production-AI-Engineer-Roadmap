@@ -16,7 +16,7 @@ logger = setup_logging(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
-    logger.info("Starting up...", version=settings.VERSION)
+    logger.info("Starting up... version=%s", settings.VERSION)
     # TODO: Initialize model manager, load AI models
     # model_manager = ModelManager()
     # await model_manager.load_models()
@@ -71,7 +71,7 @@ async def add_request_id(request: Request, call_next):
 
 @app.exception_handler(AppException)
 async def app_exception_handler(request: Request, exc: AppException):
-    logger.error(f"Application error: {exc.message}", error_code=exc.error_code)
+    logger.error("Application error: %s (code=%s)", exc.message, exc.error_code)
     return JSONResponse(
         status_code=exc.status_code,
         content={

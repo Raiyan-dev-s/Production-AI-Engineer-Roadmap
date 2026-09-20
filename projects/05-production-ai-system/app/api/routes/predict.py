@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.core.exceptions import AppException
 from app.monitoring.logger import setup_logging
 from app.monitoring.metrics import MetricsCollector
-from app.schemas.common import StandardResponse
+from app.schemas.common import ErrorDetail, StandardResponse
 
 logger = setup_logging(__name__)
 
@@ -51,7 +51,7 @@ async def predict(input_data: dict[str, Any]):
     except AppException as e:
         return StandardResponse(
             success=False,
-            error={"code": e.error_code, "message": e.message, "details": e.details},
+            error=ErrorDetail(code=e.error_code, message=e.message, details=e.details),
         )
     except Exception as e:
         logger.exception(f"Prediction failed: {e}")

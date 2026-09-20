@@ -1,8 +1,6 @@
-from typing import Any, TypeVar
+from typing import Any
 
 from pydantic import BaseModel, Field
-
-T = TypeVar("T")
 
 
 class ErrorDetail(BaseModel):
@@ -15,7 +13,7 @@ class ErrorResponse(BaseModel):
     error: ErrorDetail
 
 
-class StandardResponse(BaseModel, T):
+class StandardResponse[T](BaseModel):
     """Standard API response wrapper."""
 
     success: bool = True
@@ -24,7 +22,7 @@ class StandardResponse(BaseModel, T):
     request_id: str | None = None
 
 
-class PaginatedResponse(BaseModel, T):
+class PaginatedResponse[T](BaseModel):
     """Paginated list response."""
 
     items: list[T]

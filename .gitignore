@@ -62,8 +62,8 @@ logs/
 # AI/ML
 *.pkl
 *.joblib
-models/
-artifacts/
+/models/
+/artifacts/
 
 # Temporary files
 tmp/

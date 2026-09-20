@@ -100,9 +100,8 @@ mypy . --ignore-missing-imports
 
 GitHub Actions runs per-project jobs. Each project is tested independently from its own directory:
 
-- **lint** — Ruff from repo root
-- **project-01** — Lint, type check, test for REST API
-- **project-02** — Lint, type check, test for LLM App
+- **lint** — Ruff check and format across the repo
+- **test** — Type check and tests for each project (01–05)
 
 ## Learning Path
 

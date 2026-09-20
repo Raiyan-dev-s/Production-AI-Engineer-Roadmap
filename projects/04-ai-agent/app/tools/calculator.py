@@ -1,10 +1,11 @@
 import ast
 import operator
+from collections.abc import Callable
 
 from app.tools.base import BaseTool
 
 # Safe operators for arithmetic evaluation
-SAFE_OPERATORS = {
+SAFE_OPERATORS: dict[type[ast.AST], Callable[..., float]] = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
     ast.Mult: operator.mul,
@@ -51,9 +52,9 @@ class CalculatorTool(BaseTool):
     def _eval_node(self, node: ast.AST) -> float:
         """Recursively evaluate an AST node."""
         if isinstance(node, ast.Constant):
-            if isinstance(node.value, (int, float)):
+            if isinstance(node.value, int | float):
                 return node.value
-            raise ValueError(f"Unsupported constant: {node.value}")
+            raise ValueError(f"Unsupported constant: {node.value!r}")
 
         if isinstance(node, ast.BinOp):
             op_type = type(node.op)
@@ -61,13 +62,15 @@ class CalculatorTool(BaseTool):
                 raise ValueError(f"Unsupported operator: {op_type.__name__}")
             left = self._eval_node(node.left)
             right = self._eval_node(node.right)
+            if op_type is ast.Pow and abs(right) > 1000:
+                raise ValueError("Exponent too large")
             return SAFE_OPERATORS[op_type](left, right)
 
         if isinstance(node, ast.UnaryOp):
-            op_type = type(node.op)
-            if op_type not in SAFE_OPERATORS:
-                raise ValueError(f"Unsupported unary operator: {op_type.__name__}")
+            unary_type = type(node.op)
+            if unary_type not in SAFE_OPERATORS:
+                raise ValueError(f"Unsupported unary operator: {unary_type.__name__}")
             operand = self._eval_node(node.operand)
-            return SAFE_OPERATORS[op_type](operand)
+            return SAFE_OPERATORS[unary_type](operand)
 
         raise ValueError(f"Unsupported expression type: {type(node).__name__}")
