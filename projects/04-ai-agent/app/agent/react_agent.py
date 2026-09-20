@@ -98,7 +98,7 @@ class ReActAgent(BaseAgent):
 
         return "I don't have the right tools to answer this question."
 
-    def act(self, decision: ToolCall) -> ToolResult:
+    def act(self, decision: ToolCall | str) -> ToolResult | None:
         """Execute a tool call."""
         if isinstance(decision, str):
             return None

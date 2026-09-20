@@ -37,36 +37,37 @@ async def ingest(request: IngestRequest):
     Flow: Load → Chunk → Embed → Store
     """
     try:
-        # Step 1: Load document
+        # Step 1: Load documents
         if request.content:
-            doc = _loader.load_text(request.content, request.metadata)
+            docs = [_loader.load_text(request.content, request.metadata)]
         elif request.file_path:
-            doc = _loader.load_file(request.file_path, request.metadata)
+            docs = [_loader.load_file(request.file_path, request.metadata)]
         elif request.directory_path:
             docs = _loader.load_directory(request.directory_path, request.metadata)
-            # TODO: Handle multi-document ingestion
-            doc = docs[0] if docs else None
         else:
             raise HTTPException(
                 status_code=400,
                 detail="Provide content, file_path, or directory_path",
             )
 
-        if doc is None:
+        if not docs:
             raise HTTPException(status_code=404, detail="No documents found")
 
-        # Step 2: Chunk
-        chunks = _chunker.chunk_document(doc)
+        chunks_created = 0
+        for doc in docs:
+            # Step 2: Chunk
+            chunks = _chunker.chunk_document(doc)
 
-        # Step 3: Embed
-        embedded_chunks = _embedder.embed_chunks(chunks)
+            # Step 3: Embed
+            embedded_chunks = _embedder.embed_chunks(chunks)
 
-        # Step 4: Store
-        _vector_store.add_chunks(embedded_chunks)
+            # Step 4: Store
+            _vector_store.add_chunks(embedded_chunks)
+            chunks_created += len(embedded_chunks)
 
         return IngestResponse(
-            doc_id=doc.doc_id,
-            chunks_created=len(embedded_chunks),
+            doc_id=docs[0].doc_id or "",
+            chunks_created=chunks_created,
             status="success",
         )
     except FileNotFoundError as e:

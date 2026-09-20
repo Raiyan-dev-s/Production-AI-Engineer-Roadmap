@@ -9,87 +9,52 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.12"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Install ruff
-        run: pip install ruff>=0.6.0
+        run: pip install "ruff>=0.6.0"
 
       - name: Lint with Ruff
         run: |
           ruff check .
           ruff format --check .
 
-  project-01:
+  test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.12"]
+        project:
+          - 01-rest-api
+          - 02-llm-app
+          - 03-rag-app
+          - 04-ai-agent
+          - 05-production-ai-system
+    defaults:
+      run:
+        working-directory: projects/${{ matrix.project }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install ruff mypy
-
-      - name: Lint
-        working-directory: projects/01-rest-api
-        run: |
-          ruff check .
-          ruff format --check .
+          pip install mypy
 
       - name: Type check
-        working-directory: projects/01-rest-api
         run: mypy . --ignore-missing-imports
 
       - name: Test
-        working-directory: projects/01-rest-api
-        run: pytest tests/ -v --tb=short
-
-  project-02:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.12"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install ruff mypy
-
-      - name: Lint
-        working-directory: projects/02-llm-app
-        run: |
-          ruff check .
-          ruff format --check .
-
-      - name: Type check
-        working-directory: projects/02-llm-app
-        run: mypy . --ignore-missing-imports
-
-      - name: Test
-        working-directory: projects/02-llm-app
         run: pytest tests/ -v --tb=short

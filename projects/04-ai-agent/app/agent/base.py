@@ -25,7 +25,7 @@ class BaseAgent(ABC):
         ...
 
     @abstractmethod
-    def decide(self, thought: str, available_tools: list) -> str | dict:
+    def decide(self, thought: str, available_tools: list) -> Any:
         """Decide whether to use a tool or provide a final answer.
 
         Returns:
@@ -35,7 +35,7 @@ class BaseAgent(ABC):
         ...
 
     @abstractmethod
-    def act(self, decision: dict) -> Any:
+    def act(self, decision: Any) -> Any:
         """Execute a tool call based on the decision.
 
         Args:
