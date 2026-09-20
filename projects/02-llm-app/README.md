@@ -76,6 +76,7 @@ The layers are:
 │   ├── test_chat.py             # API endpoint tests
 │   ├── test_llm_providers.py    # Provider unit tests
 │   └── test_services.py         # Service unit tests
+├── pyproject.toml               # Project config, ruff, mypy, pytest
 ├── requirements.txt
 └── README.md
 ```

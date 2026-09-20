@@ -65,9 +65,10 @@ Each layer has a single responsibility and depends only on the layer below it.
 │   ├── services/         # Business logic layer
 │   └── main.py           # App factory
 ├── tests/                # Async pytest suite
+├── pyproject.toml        # Project config, ruff, mypy, pytest
+├── requirements.txt      # Pip-compatible dependencies
 ├── Dockerfile
 ├── docker-compose.yml
-├── requirements.txt
 └── .env.example
 ```
 

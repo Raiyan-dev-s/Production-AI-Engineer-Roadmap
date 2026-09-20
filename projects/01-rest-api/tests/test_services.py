@@ -1,5 +1,6 @@
 """Unit tests for ItemService with a mocked repository."""
 
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock
 
 import pytest
@@ -15,14 +16,29 @@ def _build_service() -> tuple[ItemService, AsyncMock]:
     return ItemService(mock_repo), mock_repo
 
 
+def _make_item(**overrides: object) -> dict[str, object]:
+    """Return a minimal item dict that satisfies ItemResponse validation."""
+    now = datetime.now(UTC)
+    base: dict[str, object] = {
+        "id": "1",
+        "name": "Test",
+        "description": None,
+        "created_at": now,
+        "updated_at": now,
+    }
+    base.update(overrides)
+    return base
+
+
 @pytest.mark.asyncio
 async def test_get_item_found() -> None:
     """get_item should return the item when the repository finds it."""
     service, mock_repo = _build_service()
-    fake_item = {"id": "1", "name": "Test"}
+    fake_item = _make_item()
     mock_repo.get.return_value = fake_item
     result = await service.get_item("1")
-    assert result == fake_item
+    assert result.id == "1"
+    assert result.name == "Test"
     mock_repo.get.assert_awaited_once_with("1")
 
 
@@ -39,22 +55,22 @@ async def test_get_item_not_found() -> None:
 async def test_get_items() -> None:
     """get_items should return items and total from the repository."""
     service, mock_repo = _build_service()
-    mock_repo.get_all.return_value = [{"id": "1"}]
+    mock_repo.get_all.return_value = [_make_item(id="1")]
     mock_repo.count.return_value = 1
     result = await service.get_items(skip=0, limit=10)
-    assert result["items"] == [{"id": "1"}]
-    assert result["total"] == 1
+    assert len(result.items) == 1
+    assert result.total == 1
 
 
 @pytest.mark.asyncio
 async def test_create_item() -> None:
     """create_item should delegate to repository.create with extracted data."""
     service, mock_repo = _build_service()
-    mock_repo.create.return_value = {"id": "1", "name": "New"}
+    mock_repo.create.return_value = _make_item(id="1", name="New")
     item_in = ItemCreate(name="New", description="desc")
     result = await service.create_item(item_in)
     mock_repo.create.assert_awaited_once_with({"name": "New", "description": "desc"})
-    assert result["name"] == "New"
+    assert result.name == "New"
 
 
 @pytest.mark.asyncio
@@ -70,24 +86,22 @@ async def test_create_item_empty_name() -> None:
 async def test_update_item() -> None:
     """update_item should merge partial data and call repository.update."""
     service, mock_repo = _build_service()
-    existing = {"id": "1", "name": "Old", "description": "old desc"}
+    existing = _make_item(id="1", name="Old", description="old desc")
     mock_repo.get.return_value = existing
-    mock_repo.update.return_value = {
-        "id": "1",
-        "name": "New",
-        "description": "old desc",
-    }
+    mock_repo.update.return_value = _make_item(
+        id="1", name="New", description="old desc"
+    )
     item_in = ItemUpdate(name="New")
     result = await service.update_item("1", item_in)
     mock_repo.update.assert_awaited_once_with(existing, {"name": "New"})
-    assert result["name"] == "New"
+    assert result.name == "New"
 
 
 @pytest.mark.asyncio
 async def test_update_item_empty_payload() -> None:
     """update_item should raise ValidationException when no fields are sent."""
     service, mock_repo = _build_service()
-    mock_repo.get.return_value = {"id": "1", "name": "X"}
+    mock_repo.get.return_value = _make_item(id="1", name="X")
     item_in = ItemUpdate()
     with pytest.raises(ValidationException):
         await service.update_item("1", item_in)
@@ -97,6 +111,7 @@ async def test_update_item_empty_payload() -> None:
 async def test_delete_item() -> None:
     """delete_item should call repository.delete after confirming the item exists."""
     service, mock_repo = _build_service()
-    mock_repo.get.return_value = {"id": "1", "name": "X"}
+    item = _make_item(id="1", name="X")
+    mock_repo.get.return_value = item
     await service.delete_item("1")
-    mock_repo.delete.assert_awaited_once_with({"id": "1", "name": "X"})
+    mock_repo.delete.assert_awaited_once_with(item)

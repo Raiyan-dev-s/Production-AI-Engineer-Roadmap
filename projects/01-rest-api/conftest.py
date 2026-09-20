@@ -1,14 +1,6 @@
 """Root conftest for Project 01.
 
-Adds the project directory to sys.path so the 'app' package is importable
-when running tests from the repository root:
-
-    pytest projects/01-rest-api/tests/ -v
+When running from the project directory, imports work naturally.
+When running from the repo root, pytest is invoked with the project
+as the working directory (see CI config).
 """
-
-import sys
-from pathlib import Path
-
-_PROJECT_ROOT = str(Path(__file__).parent)
-if _PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, _PROJECT_ROOT)

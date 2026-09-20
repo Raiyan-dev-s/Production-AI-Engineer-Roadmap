@@ -25,7 +25,12 @@ def _get_chat_service() -> ChatService:
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest) -> Any:
-    """Send a chat message and receive a completion."""
+    """Send a chat message and receive a completion.
+
+    Returns either a ChatResponse or a StreamingResponse depending on
+    the request.stream flag. The Any return type is required because
+    FastAPI supports both response types on the same endpoint.
+    """
     service = _get_chat_service()
     if request.stream:
         import json
