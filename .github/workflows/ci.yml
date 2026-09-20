@@ -36,16 +36,21 @@ jobs:
         continue-on-error: true
 
       - name: Run tests (Project 01 - REST API)
-        run: pytest projects/01-rest-api/tests/ -v --tb=short
+        working-directory: projects/01-rest-api
+        run: pytest tests/ -v --tb=short
 
       - name: Run tests (Project 02 - LLM App)
-        run: pytest projects/02-llm-app/tests/ -v --tb=short
+        working-directory: projects/02-llm-app
+        run: pytest tests/ -v --tb=short
 
       - name: Run tests (Project 03 - RAG App)
-        run: pytest projects/03-rag-app/tests/ -v --tb=short
+        working-directory: projects/03-rag-app
+        run: pytest tests/ -v --tb=short
 
       - name: Run tests (Project 04 - AI Agent)
-        run: pytest projects/04-ai-agent/tests/ -v --tb=short
+        working-directory: projects/04-ai-agent
+        run: pytest tests/ -v --tb=short
 
       - name: Run tests (Project 05 - Production AI System)
-        run: pytest projects/05-production-ai-system/tests/ -v --tb=short
+        working-directory: projects/05-production-ai-system
+        run: pytest tests/ -v --tb=short
